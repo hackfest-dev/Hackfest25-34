@@ -1,7 +1,8 @@
 // api/submission/route.js
 import { dbConnect } from "@/lib/db";
 import Submission from "@/models/Submission";
-import { classifyImage } from "@/lib/ai/classifyImage"; // Import the function
+import { classifyImage } from "@/lib/ai/classifyImage";
+import { analyzeWithGemini } from "@/lib/gemini";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
@@ -9,13 +10,23 @@ export async function POST(req) {
 	const body = await req.json();
 
 	let aiData = {};
+
 	if (body.type === "photo") {
-		const { labels } = await classifyImage(body.mediaUrl); // Call the Vision API
+		const { labels } = await classifyImage(body.mediaUrl);
+
+		let prompt = `Give a detailed botanical, historical, and ecological explanation of these: ${labels
+			.map((l) => l.label)
+			.join(
+				", "
+			)}. Include names, uses, habitat, origin, and interesting facts.`;
+
+		let advancedAnalysis = await analyzeWithGemini(prompt);
 
 		aiData = {
 			species: labels[0]?.label || "unknown",
 			confidence: labels[0]?.score || 0,
 			labels: labels,
+			advancedAnalysis: advancedAnalysis || "No analysis available",
 		};
 	}
 
@@ -29,7 +40,7 @@ export async function POST(req) {
 			category: body.category,
 			airData: body.airData,
 			weather: body.weather,
-			aiData: aiData, // Save AI data (labels)
+			aiData,
 			status: "pending",
 			duplicate: false,
 		});

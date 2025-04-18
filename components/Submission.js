@@ -1,7 +1,9 @@
 "use client";
+import ReactMarkdown from "react-markdown";
 
 import { useEffect, useState } from "react";
-
+import { marked } from "marked";
+import DOMPurify from "dompurify"; // for safety (prevent XSS)
 export default function UploadForm({ userId }) {
 	const [files, setFiles] = useState([]);
 	const [previews, setPreviews] = useState([]);
@@ -137,6 +139,19 @@ export default function UploadForm({ userId }) {
 							</li>
 						))}
 					</ul>
+				</div>
+			)}
+			{lastAiData?.advancedAnalysis && (
+				<div className="mt-4 p-4 border rounded bg-yellow-100">
+					<h4 className="font-semibold">Gemini Insight:</h4>
+					<div
+						className="prose max-w-none"
+						dangerouslySetInnerHTML={{
+							__html: DOMPurify.sanitize(
+								marked.parse(lastAiData.advancedAnalysis)
+							),
+						}}
+					/>
 				</div>
 			)}
 		</div>

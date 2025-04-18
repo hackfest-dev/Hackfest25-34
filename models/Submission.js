@@ -37,6 +37,7 @@ const SubmissionSchema = new mongoose.Schema({
 				score: Number,
 			},
 		],
+		advancedAnalysis: String, // ← NEW FIELD
 	},
 
 	category: { type: String, enum: ["litter", "pollution", "wildlife"] },
