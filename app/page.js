@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import UploadForm from "@/components/Submission";
+import NoiseCapture from "@/components/Noise";
 
 export default function Home() {
 	const [imageUrl, setImageUrl] = useState("");
@@ -22,6 +23,7 @@ export default function Home() {
 		<main className="p-6">
 			Home
 			<UploadForm />
+			<NoiseCapture />
 		</main>
 	);
 }
