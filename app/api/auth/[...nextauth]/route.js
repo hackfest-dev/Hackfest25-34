@@ -3,7 +3,7 @@ import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectDB } from "@/lib/mongodb";
+import { dbConnect } from "@/lib/db";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
 import User from "@/models/User";
@@ -25,7 +25,7 @@ export const handler = NextAuth({
 				password: {},
 			},
 			async authorize(credentials) {
-				await connectDB();
+				await dbConnect();
 				const user = await User.findOne({ email: credentials.email });
 				if (!user || !user.password) {
 					throw new Error("No user found");
@@ -43,7 +43,7 @@ export const handler = NextAuth({
 	// secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
 		async signIn({ user, account, profile }) {
-			await connectDB();
+			await dbConnect();
 			const existingUser = await User.findOne({ email: user.email });
 			if (!existingUser) {
 				await User.create({
@@ -56,7 +56,7 @@ export const handler = NextAuth({
 			return true;
 		},
 		async session({ session }) {
-			await connectDB();
+			await dbConnect();
 			const user = await User.findOne({ email: session.user.email });
 			session.user.id = user._id;
 			return session;
