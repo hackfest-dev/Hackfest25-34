@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-const Map = dynamic(() => import("@/components/AdminMap"), { ssr: false });
-
 export default function AdminDashboard() {
 	const [submissions, setSubmissions] = useState([]);
 
@@ -18,8 +16,6 @@ export default function AdminDashboard() {
 	return (
 		<div className="p-6 space-y-6">
 			<h1 className="text-3xl font-bold">Admin Dashboard</h1>
-
-			{/* <Map submissions={submissions} /> */}
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{submissions.map((s) => (

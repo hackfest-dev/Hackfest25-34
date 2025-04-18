@@ -6,9 +6,21 @@ const SubmissionSchema = new mongoose.Schema({
 	mediaUrl: String,
 	description: String,
 	location: {
-		lat: Number,
-		lng: Number,
+		type: {
+			type: String,
+			enum: ["Point"],
+			default: "Point",
+		},
+		coordinates: {
+			type: [Number], // [longitude, latitude]
+			required: true,
+		},
+		country: String,
+		state: String,
+		city: String,
+		village: String,
 	},
+
 	airData: {
 		aqi: Number,
 		pm25: Number,
@@ -37,6 +49,12 @@ const SubmissionSchema = new mongoose.Schema({
 		enum: ["pending", "verified", "flagged"],
 		default: "pending",
 	},
+	adminStatus: {
+		type: String,
+		enum: ["approved", "rejected", "flagged", ""],
+	},
+	adminNotes: { type: String },
+
 	duplicate: { type: Boolean, default: false },
 	createdAt: { type: Date, default: Date.now },
 });

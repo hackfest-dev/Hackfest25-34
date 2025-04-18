@@ -25,15 +25,45 @@ export default function UploadForm({ userId }) {
 			};
 			setLocation(loc);
 
-			const res = await fetch(
+			// Fetch air + weather
+			const envRes = await fetch(
 				`/api/environmental?lat=${loc.lat}&lng=${loc.lng}`
 			);
-			const data = await res.json();
+			const envData = await envRes.json();
+			setAirData(envData.air);
+			setWeather(envData.weather);
 
-			setAirData(data.air);
-			setWeather(data.weather); // if you're using weather too
+			// Fetch address info
+			const geoRes = await fetch(
+				`/api/reverse-geocode?lat=${loc.lat}&lng=${loc.lng}`
+			);
+			const geoData = await geoRes.json();
+			setLocation((prev) => ({
+				...prev,
+				country: geoData.country,
+				state: geoData.state,
+				city: geoData.city,
+				village: geoData.village,
+			}));
 		});
 	}, []);
+
+	async function getAddressFromCoords(lat, lng) {
+		const res = await fetch(
+			`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`
+		);
+		const data = await res.json();
+
+		const address = data.address || {};
+		const components = data.results[0].components;
+
+		return NextResponse.json({
+			country: components.country || "",
+			state: components.state || "",
+			city: components.city || components.town || components.county || "",
+			village: components.village || components.town || "",
+		});
+	}
 
 	const handleFileChange = (e) => {
 		const selected = Array.from(e.target.files);
@@ -48,6 +78,19 @@ export default function UploadForm({ userId }) {
 
 		setUploading(true);
 
+		const { lat, lng } = location;
+
+		// 1. Get detailed location info
+		const extraLocation = await getAddressFromCoords(lat, lng);
+
+		// 2. Build the full location object (GeoJSON + extra fields)
+		const fullLocation = {
+			type: "Point",
+			coordinates: [lng, lat],
+			...extraLocation,
+		};
+
+		// 3. Loop through selected files and upload them
 		for (let file of files) {
 			const formData = new FormData();
 			formData.append("file", file);
@@ -59,6 +102,7 @@ export default function UploadForm({ userId }) {
 
 			const { url } = await uploadRes.json();
 
+			// 4. Submit full data to your backend
 			const res = await fetch("/api/submission", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -67,12 +111,20 @@ export default function UploadForm({ userId }) {
 					type,
 					mediaUrl: url,
 					description,
-					location,
+					location: {
+						type: "Point",
+						coordinates: [location.lng, location.lat],
+						country: location.country,
+						state: location.state,
+						city: location.city,
+						village: location.village,
+					},
 					category,
 					airData,
-					weather, // optional
+					weather,
 				}),
 			});
+
 			const data = await res.json();
 			setLastAiData(data.submission?.aiData || null);
 		}
@@ -141,7 +193,7 @@ export default function UploadForm({ userId }) {
 					</ul>
 				</div>
 			)}
-			{lastAiData?.advancedAnalysis && (
+			{/* {lastAiData?.advancedAnalysis && (
 				<div className="mt-4 p-4 border rounded bg-yellow-100">
 					<h4 className="font-semibold">Gemini Insight:</h4>
 					<div
@@ -153,7 +205,7 @@ export default function UploadForm({ userId }) {
 						}}
 					/>
 				</div>
-			)}
+			)} */}
 		</div>
 	);
 }
