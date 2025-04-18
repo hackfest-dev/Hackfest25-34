@@ -23,23 +23,14 @@ const SubmissionSchema = new mongoose.Schema({
 	aiData: {
 		species: String,
 		confidence: Number,
-		noiseType: String,
-		decibel: Number,
-		airData: {
-			aqi: Number,
-			pm25: Number,
-			co: Number,
-			fetchedAt: Date,
-		},
 		labels: [
 			{
 				label: String,
 				score: Number,
 			},
 		],
-		advancedAnalysis: String, // ← NEW FIELD
+		advancedAnalysis: String, // ← New field for advanced AI analysis
 	},
-
 	category: { type: String, enum: ["litter", "pollution", "wildlife"] },
 	status: {
 		type: String,
