@@ -136,9 +136,17 @@ export default function MissionDashboardPage() {
 						key={index}
 						className="rounded-2xl shadow-lg p-4 bg-white">
 						<CardContent>
-							{/* <h2 className="text-xl font-semibold mb-2">
-								{mission.title || "🌍 Untitled Mission"}
-							</h2> */}
+							<div className="text-xl font-semibold mb-2">
+								<ReactMarkdown
+									rehypePlugins={[
+										rehypeRaw,
+										rehypeSanitize,
+										rehypeHighlight,
+									]}
+									components={markdownComponents}>
+									{mission.title || "🌍 Untitled Mission"}
+								</ReactMarkdown>
+							</div>
 
 							<div className="mb-4 text-gray-700 space-y-2">
 								<ReactMarkdown
