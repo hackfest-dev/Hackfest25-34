@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import MissionDashboardPage from "@/components/Mission";
-
 export default function AllMissionsPage() {
 	const [missions, setMissions] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -37,7 +36,7 @@ export default function AllMissionsPage() {
 
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-			<MissionDashboardPage
+			<MissionDashboardPage />
 			{missions.map((mission, index) => (
 				<Card
 					key={index}
