@@ -1,6 +1,6 @@
 import { getLocationDetails } from "@/lib/geocode";
 import { connectDB } from "@/lib/db"; // your MongoDB connect util
-import Observation from "@/models/Observation"; // or Submission/ImageSubmission
+import Submission from "@/models/Submission"; // or Submission/ImageSubmission
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
@@ -20,7 +20,7 @@ export async function POST(req) {
 		const [lon, lat] = coordinates;
 		const locationDetails = await getLocationDetails(lat, lon);
 
-		const newObservation = new Observation({
+		const newSubmission = new Submission({
 			...rest,
 			location: {
 				type: "Point",
@@ -29,10 +29,10 @@ export async function POST(req) {
 			},
 		});
 
-		await newObservation.save();
+		await newSubmission.save();
 
 		return NextResponse.json(
-			{ success: true, data: newObservation },
+			{ success: true, data: newSubmission },
 			{ status: 201 }
 		);
 	} catch (err) {

@@ -1,19 +1,27 @@
 // models/Mission.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const MissionSchema = new mongoose.Schema({
-	userId: mongoose.Schema.Types.ObjectId,
-	title: String,
-	description: String,
-	steps: [String],
-	reward: String,
-	tags: [String],
-	location: {
-		city: String,
-		country: String,
+const missionSchema = new mongoose.Schema(
+	{
+		title: String,
+		description: String,
+		steps: [String],
+		reward: String,
+		funFact: String,
+		tags: [String],
+		userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Optional: to associate the mission with a user
+		status: {
+			type: String,
+			enum: ["incomplete", "completed", "in-progress"],
+			default: "incomplete",
+		}, // Status field
 	},
-	generatedAt: { type: Date, default: Date.now },
-});
+	{ timestamps: true } // Automatically add createdAt and updatedAt fields
+);
 
-module.exports =
-	mongoose.models.Mission || mongoose.model("Mission", MissionSchema);
+// const Mission =
+// 	mongoose.models.Mission || mongoose.model("Mission", missionSchema);
+
+// module.exports = Mission;
+export default mongoose.models.Mission ||
+	mongoose.model("Mission", missionSchema);
