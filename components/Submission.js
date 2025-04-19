@@ -199,7 +199,7 @@ export default function UploadForm({ userId }) {
 					</ul>
 				</div>
 			)}
-			{/* {lastAiData?.advancedAnalysis && (
+			{lastAiData?.advancedAnalysis && (
 				<div className="mt-4 p-4 border rounded bg-yellow-100">
 					<h4 className="font-semibold">Gemini Insight:</h4>
 					<div
@@ -211,7 +211,7 @@ export default function UploadForm({ userId }) {
 						}}
 					/>
 				</div>
-			)} */}
+			)}
 		</div>
 	);
 }

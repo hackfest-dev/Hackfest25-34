@@ -9,7 +9,7 @@ export default function Navbar() {
 			<Link href="/missions" className="text-sm text-gray-700 hover:text-green-700 font-medium">Missions</Link>
 			<Link href="/capture" className="text-sm text-gray-700 hover:text-green-700 font-medium">Capture</Link>
 			<Link href="/profile" className="text-sm text-gray-700 hover:text-green-700 font-medium">Profile</Link>
-			<Link href="/admin" className="text-sm text-red-600 hover:text-red-700 font-semibold">Admin Dashboard</Link>
+			<Link href="/admin/dashboard" className="text-sm text-red-600 hover:text-red-700 font-semibold">Admin Dashboard</Link>
 		</nav>
 	);
 }
