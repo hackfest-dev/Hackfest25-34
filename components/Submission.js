@@ -53,6 +53,12 @@ export default function UploadForm({ userId }) {
 			`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`
 		);
 		const data = await res.json();
+		console.log("Address data:", data);
+		// Ensure results are available
+		if (!data.results || data.results.length === 0) {
+			console.error("No results found for these coordinates:", lat, lng);
+			return {}; // or handle the error as needed
+		}
 
 		const address = data.address || {};
 		const components = data.results[0].components;

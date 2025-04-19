@@ -4,9 +4,9 @@ import missionSchema from "@/models/Mission"; // Your mission model
 import { NextResponse } from "next/server"; // Import NextResponse
 
 export async function GET(req) {
+	const { searchParams } = new URL(req.url); // ✅ Fix here
+	const userId = searchParams.get("userId");
 	try {
-		const userId = req.nextUrl.searchParams.get("userId");
-
 		if (!userId) {
 			return NextResponse.json(
 				{ success: false, message: "User ID is required" },

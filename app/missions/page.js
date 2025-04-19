@@ -1,56 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { getLiveUserData } from "@/lib/getLiveUserData";
 import { useSession } from "next-auth/react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeHighlight from "rehype-highlight";
-
-function formatReward(raw) {
-	if (!raw) return "No reward specified.";
-
-	let formatted = raw
-		.replace(/\*Steps:\*\*/gi, "### Steps")
-		.replace(/\*Reward Summary:\*\*/gi, "### Reward Summary")
-		.replace(/\*Fun Fact:\*\*/gi, "### Fun Fact")
-		.replace(/\*\*(.*?)\*\*/g, "**$1**")
-		.replace(/\*/g, "")
-		.trim();
-
-	if (!formatted.includes("###")) {
-		formatted = `### Reward\n${formatted}`;
-	}
-
-	return formatted;
-}
-
-function formatSteps(raw) {
-	if (!raw) return "No steps provided.";
-
-	if (Array.isArray(raw)) {
-		// Join array of steps into a markdown bullet list
-		return raw.map((step) => `- ${step}`).join("\n");
-	}
-
-	if (typeof raw === "object") {
-		// Object: try to get values and join
-		return Object.values(raw)
-			.map((step) => `- ${step}`)
-			.join("\n");
-	}
-
-	// Fallback: treat it as string and clean a bit
-	return raw
-		.split(",") // handles comma-separated
-		.map((line) => `- ${line.trim()}`)
-		.join("\n");
-}
-
+import MissionDashboardPage from "@/components/Mission";
+import MissionList from "@/components/MissionList";
 const markdownComponents = {
 	p: ({ children }) => <p className="mb-2 text-gray-800">{children}</p>,
 	h3: ({ children }) => (
@@ -59,74 +17,75 @@ const markdownComponents = {
 	li: ({ children }) => <li className="list-disc ml-6">{children}</li>,
 };
 
-export default function MissionDashboardPage() {
+export default function MissionPage() {
 	const [loading, setLoading] = useState(false);
 	const [missions, setMissions] = useState([]);
 	const [error, setError] = useState(null);
 	const { data: session } = useSession();
 	const userId = session?.user?.id;
+	console.log("User ID for fetch:", userId);
 
-	const generateMission = async () => {
+	// Fetch missions when the component mounts
+	const fetchMissions = async () => {
 		setLoading(true);
 		setError(null);
 		try {
-			const userData = await getLiveUserData();
-			if (!userData) throw new Error("Failed to get user data.");
+			const res = await fetch(`/api/get-mission?userId=${userId}`);
+			const data = await res.json();
 
-			const res = await fetch("/api/missions/generate", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					userId: userId || "guest",
-					userData,
-				}),
-			});
+			console.log("Fetched missions:", data); // Add this
 
-			if (!res.ok) throw new Error("Gemini failed: " + res.statusText);
-			const newMission = await res.json();
-
-			if (newMission?.title || newMission?.description) {
-				setMissions((prev) => [newMission, ...prev]);
+			if (data.success) {
+				setMissions(data.missions);
 			} else {
-				throw new Error("Invalid mission format received.");
+				setError(data.message || "Failed to fetch missions.");
 			}
 		} catch (err) {
 			console.error(err);
-			setError("Error generating mission: " + err.message);
+			setError("Error fetching missions: " + err.message);
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	useEffect(() => {
-		if (missions.length === 0) {
-			generateMission();
+		console.log("Session data:", session);
+		if (userId) {
+			fetchMissions();
 		}
-	}, []);
+		console.log(userId); // Add this
+	}, [userId, session]);
 
 	return (
 		<div className="max-w-6xl mx-auto py-10 px-4">
-			<div className="flex justify-between items-center mb-8">
-				<h1 className="text-3xl font-bold">🌱 Your Missions</h1>
-				<Button
-					onClick={generateMission}
-					disabled={loading}>
-					{loading ? (
-						<>
-							<Loader2 className="animate-spin mr-2 h-4 w-4" />
-							Generating...
-						</>
-					) : (
-						"Generate Mission"
-					)}
-				</Button>
-			</div>
+			<MissionList missions={missions} />
+			{/* <MissionDashboardPage /> */}
+			{/* <div>
+				<h1>Mission Page</h1>
+				{missions.length > 0 ? (
+					<div>
+						{missions.map((mission, index) => (
+							<div key={index}>
+								<h2>{mission.title}</h2>
+								<p>{mission.description}</p>
+								<ul>
+									{mission.steps.map((step, idx) => (
+										<li key={idx}>{step}</li>
+									))}
+								</ul>
+							</div>
+						))}
+					</div>
+				) : (
+					<p>No mission available.</p>
+				)}
+			</div> */}
 
 			{error && <p className="text-red-500 text-center">{error}</p>}
 
 			{missions.length === 0 && !loading && (
 				<p className="text-gray-500 text-center mt-20">
-					No missions yet. Click “Generate Mission” to get started!
+					No missions yet. Please check again later.
 				</p>
 			)}
 
@@ -172,7 +131,7 @@ export default function MissionDashboardPage() {
 											rehypeHighlight,
 										]}
 										components={markdownComponents}>
-										{formatSteps(mission.steps)}
+										{mission.steps.join("\n")}
 									</ReactMarkdown>
 								</>
 							)}
@@ -185,7 +144,7 @@ export default function MissionDashboardPage() {
 										rehypeHighlight,
 									]}
 									components={markdownComponents}>
-									{formatReward(mission.reward)}
+									{mission.reward || "No reward specified."}
 								</ReactMarkdown>
 							</div>
 

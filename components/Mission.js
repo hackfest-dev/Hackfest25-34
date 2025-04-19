@@ -12,6 +12,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeHighlight from "rehype-highlight";
 import mongoose from "mongoose";
+import { useRouter } from "next/navigation";
 
 const markdownComponents = {
 	p: ({ children }) => <p className="mb-2 text-gray-800">{children}</p>,
@@ -27,6 +28,7 @@ export default function MissionDashboardPage() {
 	const [error, setError] = useState(null);
 	const { data: session } = useSession();
 	const userId = session?.user?.id;
+	const router = useRouter();
 
 	const generateMission = async () => {
 		setLoading(true);
@@ -156,7 +158,10 @@ export default function MissionDashboardPage() {
 				{missions.map((mission, index) => (
 					<Card
 						key={index}
-						className="rounded-2xl shadow-lg p-4 bg-white">
+						className="rounded-2xl shadow-lg p-4 bg-white cursor-pointer hover:shadow-xl transition"
+						onClick={() =>
+							router.push(`/submit?missionId=${mission._id}`)
+						}>
 						<CardContent>
 							<div className="text-xl font-semibold mb-2">
 								<ReactMarkdown

@@ -19,6 +19,11 @@ const User = new mongoose.Schema(
 			noise: { type: Number, default: 0 },
 			observation: { type: Number, default: 0 },
 		},
+		exp: { type: Number, default: 0 },
+		badges: [{ name: String, description: String, earnedAt: Date }],
+		completedMissions: [
+			{ type: mongoose.Schema.Types.ObjectId, ref: "Mission" },
+		],
 	},
 	{ timestamps: true }
 );
