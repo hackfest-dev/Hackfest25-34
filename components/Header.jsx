@@ -1,16 +1,24 @@
+"use client";
 import Image from "next/image";
 
 export default function Header() {
 	return (
-		<header className="w-full flex items-center justify-center p-4 bg-white shadow-sm">
-			<div className="flex items-center gap-3 bg-gradient-to-r from-green-400 to-lime-500 px-4 py-2 rounded-xl">
+		<header className="w-full bg-white/70 backdrop-blur-md shadow-md px-4 py-3 flex items-center justify-between border-b border-green-300">
+			<div className="flex items-center space-x-3">
 				<Image
 					src="/enviroquest-logo.png"
 					alt="EnviroQuest Logo"
-					width={32}
-					height={32}
+					width={40}
+					height={40}
+					className="rounded-full"
 				/>
-				<h1 className="text-xl font-bold text-white">EnviroQuest</h1>
+				<h1 className="text-2xl font-bold text-green-800 tracking-wide">
+					EnviroQuest
+				</h1>
+			</div>
+
+			<div className="text-sm text-green-700 font-medium hidden sm:block">
+				🌿 Gamify Your Green Journey
 			</div>
 		</header>
 	);
