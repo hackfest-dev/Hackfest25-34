@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import AQICard from "@/components/AQICard";
@@ -12,6 +12,7 @@ import BadgeBar from "@/components/BadgeBar";
 export default function DashboardPage() {
 	const { data: session, status } = useSession();
 	const router = useRouter();
+	const [aqiInfo, setAqiInfo] = useState(null);
 
 	useEffect(() => {
 		if (status === "unauthenticated") {
@@ -19,8 +20,25 @@ export default function DashboardPage() {
 		}
 	}, [status, router]);
 
+	useEffect(() => {
+		const fetchAQI = async () => {
+			try {
+				const res = await fetch("/api/aqi");
+				const data = await res.json();
+				setAqiInfo(data);
+			} catch (error) {
+				console.error("Failed to fetch AQI:", error);
+			}
+		};
+		fetchAQI();
+	}, []);
+
 	if (status === "loading") {
-		return <div className="flex justify-center items-center min-h-screen text-xl text-gray-600">Loading your dashboard...</div>;
+		return (
+			<div className="flex justify-center items-center min-h-screen text-xl text-gray-600">
+				Loading your dashboard...
+			</div>
+		);
 	}
 
 	const missions = [
@@ -67,7 +85,13 @@ export default function DashboardPage() {
 
 				{/* Highlights */}
 				<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-					<AQICard city="Bengaluru" aqi={85} />
+					{aqiInfo ? (
+						<AQICard city={aqiInfo.city} aqi={aqiInfo.aqi} />
+					) : (
+						<div className="bg-white rounded-xl p-6 text-center shadow animate-pulse">
+							Loading AQI...
+						</div>
+					)}
 					<XPProgress level={3} xp={120} goal={250} />
 					<BadgeBar badges={badges} />
 				</div>
@@ -85,3 +109,8 @@ export default function DashboardPage() {
 		</div>
 	);
 }
+
+
+
+
+
