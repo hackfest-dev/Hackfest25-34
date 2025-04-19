@@ -1,6 +1,8 @@
 "use client";
+
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
@@ -12,40 +14,49 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="flex flex-col items-center justify-center h-screen space-y-4">
-			<h1 className="text-2xl font-bold">Login</h1>
-			<form
-				onSubmit={handleCredentialsLogin}
-				className="space-y-2">
-				<input
-					type="email"
-					placeholder="Email"
-					className="border px-3 py-2"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					required
-				/>
-				<input
-					type="password"
-					placeholder="Password"
-					className="border px-3 py-2"
-					value={password}
-					onChange={(e) => setPassword(e.target.value)}
-					required
-				/>
-				<button
-					type="submit"
-					className="bg-blue-500 text-white px-4 py-2">
-					Login
-				</button>
-			</form>
+		<div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 via-blue-100 to-purple-100">
+			<div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+				<h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Login to EnviroQuest</h1>
+				
+				<form onSubmit={handleCredentialsLogin} className="space-y-4">
+					<input
+						type="email"
+						placeholder="Email"
+						className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						required
+					/>
+					<input
+						type="password"
+						placeholder="Password"
+						className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						required
+					/>
+					<button
+						type="submit"
+						className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
+						Login
+					</button>
+				</form>
 
-			<hr className="w-1/2 my-4" />
-			<button
-				className="bg-red-500 text-white px-4 py-2"
-				onClick={() => signIn("google", { callbackUrl: "/" })}>
-				Sign in with Google
-			</button>
+				<div className="my-4 text-center text-sm text-gray-500">or</div>
+
+				<button
+					className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition"
+					onClick={() => signIn("google", { callbackUrl: "/" })}>
+					Sign in with Google
+				</button>
+
+				<p className="mt-6 text-sm text-center text-gray-600">
+					Don't have an account?{" "}
+					<Link href="/signup" className="text-blue-600 hover:underline">
+						Sign up
+					</Link>
+				</p>
+			</div>
 		</div>
 	);
 }
