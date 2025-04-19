@@ -23,7 +23,7 @@ export default function Home() {
 		<main className="p-6">
 			Home
 			<UploadForm />
-			<NoiseCapture />
+			{/* <NoiseCapture /> */}
 		</main>
 	);
 }
